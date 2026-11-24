@@ -2399,7 +2399,6 @@ html.mobile-mode .window > .title-bar {
   padding: 0 !important;
   border: none !important;
   background: transparent !important;
-  display: block !important;
   touch-action: none;
   cursor: grab;
 }
@@ -2416,7 +2415,31 @@ html.mobile-mode .window > .title-bar {
   width: 66px !important;
   height: 82px !important;
   border-radius: 0 !important;
-  object-fit: cover !important;
+  /* fill 而不是 cover：9 块 200×200 的方块拼成整张图时，相邻边缘才不会错位 */
+  object-fit: fill !important;
+}
+
+/* 拼合完成的成品图（pt/fullpt.webp） */
+#phone-puzzle-layer .ppl-done {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: min(72vw, 300px);
+  height: auto;
+  border-radius: 12px;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.6);
+  transform: translate(-50%, -50%) scale(0.86);
+  opacity: 0;
+  animation: ppl-done-pop 0.42s cubic-bezier(0.2, 0.9, 0.3, 1.15) forwards;
+  z-index: 30;
+  pointer-events: none;
+}
+
+@keyframes ppl-done-pop {
+  to {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
 }
 #phone-puzzle-layer .desktop-icon .icon-text {
   position: absolute;

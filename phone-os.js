@@ -246,11 +246,21 @@
     var chipEl = document.getElementById(PUZZLE_CHIP_ID);
     if (solved) {
       if (chipEl) chipEl.style.display = "none";
-      // 拼好之后先让玩家看一眼成品，再把画布收掉、露出新出现的"日记"图标
+      // 拼好的一瞬间，把成品图（pt/fullpt.webp，上面是 1314）铺出来看一眼，
+      // 再收画布；否则碎片直接消失、主屏只多出一个 56px 小图标，玩家会以为"拼没了"。
       if (layer && layer.style.display !== "none" && !puzzleSolvedTimer) {
+        var guideEl = layer.querySelector(".ppl-guide");
+        if (guideEl) guideEl.style.display = "none";
+        if (!layer.querySelector(".ppl-done")) {
+          var done = document.createElement("img");
+          done.className = "ppl-done";
+          done.src = "pt/fullpt.webp";
+          done.alt = "拼好的照片";
+          layer.appendChild(done);
+        }
         puzzleSolvedTimer = setTimeout(function () {
           if (layer) layer.style.display = "none";
-        }, 1600);
+        }, 2400);
       }
       return;
     }
