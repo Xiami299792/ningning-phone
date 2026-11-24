@@ -4,7 +4,7 @@
 
 <h1>宁宁的手机</h1>
 
-<p><b>基于 <a href="https://github.com/bcmh-ovo">bcmh</a>《魔法兔兔》的手机 UI 重设计版</b><br>
+<p><b>基于 bcmh《魔法兔兔》的手机 UI 重设计版</b><br>
 <sub>A mobile-OS redesign of bcmh's <i>魔法兔兔 (Magic Rabbit)</i></sub></p>
 
 <p>
@@ -100,7 +100,7 @@ npx serve .
 └── preview/            README 用的截图
 ```
 
-**新增文件只有 `phone-os.css` 和 `phone-os.js`**，其余均为原作文件（`pc.html` 仅追加了两行引用）。
+**新增文件是 `phone-os.css` 与 `phone-os.js`**（外壳层）；`index.html`、`pc.html`、`tuzi.html` 等入口页做了少量接入改动（例如 `pc.html` 追加两行引用）。图片、音频、视频等素材与原作保持一致。
 
 ## 技术说明
 
@@ -111,7 +111,7 @@ npx serve .
 
 ## 版权与致谢
 
-- **原作：《魔法兔兔》 by [@bcmh_ovo](https://github.com/bcmh-ovo)**
+- **原作：《魔法兔兔》 by @bcmh_ovo**
   剧情、谜题、文本、美术、音频及全部世界观设定版权归原作者所有。
 - 本仓库仅重写**界面外壳与交互方式**，属于同人性质的 UI 重设计移植，**不主张对原作内容的任何权利**。
 - 仓库内不包含原作之外的商业素材；如原作者认为本移植不妥，提出后我会立即下架。
