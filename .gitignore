@@ -1,0 +1,15 @@
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# editors
+.vscode/
+.idea/
+
+# logs & temp
+*.log
+npm-debug.log*
+
+# dependencies (this project has none, but just in case)
+node_modules/

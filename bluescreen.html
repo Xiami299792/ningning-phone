@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>系统崩溃</title>
+    <link rel="icon" href="image/app.webp" type="image/webp">
+    <link rel="stylesheet" href="phone-os.css">
+    <script>
+    if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.register("sw.js").catch(function() {});
+    }
+    </script>
+    <style>
+        .panic-screen {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, #005fb8 0%, #00458f 100%);
+            color: #fff;
+            padding: 68px 26px 32px 26px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            overflow-y: auto;
+            font-family: var(--os-font);
+        }
+        .panic-top-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            font-family: ui-monospace, Menlo, Consolas, monospace;
+            letter-spacing: 0.6px;
+            opacity: 0.78;
+            margin-bottom: 18px;
+        }
+        .sad-face {
+            font-size: 64px;
+            font-weight: 300;
+            line-height: 1;
+            margin-bottom: 18px;
+        }
+        .message {
+            font-size: 17px;
+            font-weight: 400;
+            line-height: 1.55;
+            margin-bottom: 22px;
+        }
+        .progress {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 24px;
+            font-variant-numeric: tabular-nums;
+        }
+        .details {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            padding: 14px;
+            border-radius: 16px;
+            background: rgba(0, 0, 0, 0.18);
+            border: 1px solid rgba(255, 255, 255, 0.16);
+        }
+        .qr-link {
+            display: block;
+            flex-shrink: 0;
+            background: #fff;
+            padding: 4px;
+            border-radius: 8px;
+        }
+        .qr-code {
+            width: 88px;
+            height: 88px;
+            display: block;
+        }
+        .info {
+            font-size: 11.5px;
+            line-height: 1.55;
+            color: rgba(255, 255, 255, 0.9);
+            word-break: break-all;
+        }
+        .panic-log {
+            margin-top: 18px;
+            font-family: ui-monospace, Menlo, Consolas, monospace;
+            font-size: 10.5px;
+            line-height: 1.5;
+            color: rgba(220, 238, 255, 0.72);
+            border-top: 1px solid rgba(255, 255, 255, 0.14);
+            padding-top: 12px;
+        }
+    </style>
+</head>
+<body>
+<div class="phone-stage">
+  <div class="phone-chassis">
+    <div class="phone-screen">
+      <div class="panic-screen">
+        <div>
+          <div class="panic-top-tag">● NINGOS KERNEL PANIC // FATAL EXCEPTION</div>
+          <div class="sad-face">:(</div>
+          <div class="message">你的手机遇到严重系统错误，需要重新启动。<br>我们正在收集部分崩溃日志，随后将为你自动重启。</div>
+          <div class="progress"><span id="percentage">0</span>% 完成</div>
+          <div class="details">
+            <a class="qr-link" href="support.html" title="点击查看设备支持信息">
+              <canvas class="qr-code" id="bsod-qr" width="110" height="110"></canvas>
+            </a>
+            <div class="info">
+              扫码或轻触左侧二维码查看支持页面：<br>
+              support.ningos.mobile/stopcode<br><br>
+              终止代码：<br>
+              <strong>CRITICAL_PROCESS_DIED</strong>
+            </div>
+          </div>
+        </div>
+        <div class="panic-log">
+          [ERR] proc_guard: unexpected memory write @ 0x00F9A2<br>
+          [ERR] mount /userdata/loop_state -> sync pending...<br>
+          [SYS] DO NOT POWER OFF DEVICE
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="js/qr.js"></script>
+<script src="js/bluescreen.js"></script>
+</body>
+</html>
