@@ -1,5 +1,18 @@
 document.addEventListener("DOMContentLoaded", () => {
-    let zIndexCounter = 10;
+    // 起点必须高于 .window 的 CSS 基准（100），否则 bringToFront() 实际是在"降级"。
+    let zIndexCounter = 100;
+
+    // #win-settings / #win-hospitalpdf 原本挂在 #desktop 之外，而 #desktop 带 z-index:1
+    // 自成层叠上下文——它们会永久压住其它窗口（开设置后再开应用，应用是"隐形"的）。
+    (function hoistStrayWindows() {
+        const desk = document.getElementById("desktop");
+        if (!desk) return;
+        ["win-settings", "win-hospitalpdf"].forEach(id => {
+            const w = document.getElementById(id);
+            if (w && w.parentElement !== desk) desk.appendChild(w);
+        });
+    })();
+
     let GRID_W = 80;
     let GRID_H = 100;
     const OFFSET_X = 15;
