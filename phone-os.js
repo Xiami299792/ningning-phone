@@ -208,6 +208,139 @@
     }
   }
 
+  /* ========================================================================
+     Loop 2 Jigsaw Layer
+     PC 版把 9 块拼图碎片当桌面图标，靠 absolute 的 left/top 拼合，并由
+     main.js 的 checkCreepyPuzzle() 逐块比对坐标。手机壳把这些图标塞进
+     CSS Grid，并用 `left:auto !important` 锁了坐标 —— 碎片既拖不动，也
+     拼不出图。这里把它们挪进一块独立的绝对定位画布，恢复原作玩法。
+     ======================================================================== */
+  var PUZZLE_LAYER_ID = "phone-puzzle-layer";
+  var PUZZLE_CHIP_ID = "phone-puzzle-chip";
+  var PUZZLE_SHUFFLE = [ 4, 7, 1, 6, 2, 5, 0, 3 ];
+  var puzzleWatchStarted = false;
+  var puzzleSolvedTimer = null;
+
+  function puzzlePieceEls() {
+    var arr = [];
+    for (var i = 1; i <= 9; i++) {
+      var el = document.getElementById("icon-cpic" + i);
+      if (el && el.style.display !== "none") arr.push(el);
+    }
+    return arr;
+  }
+
+  function showPuzzleLayer(show) {
+    var layer = document.getElementById(PUZZLE_LAYER_ID);
+    var chip = document.getElementById(PUZZLE_CHIP_ID);
+    if (layer) layer.style.display = show ? "flex" : "none";
+    if (chip) chip.style.display = show ? "none" : "block";
+  }
+
+  function ensurePuzzleLayer() {
+    var solved = false;
+    try {
+      solved = localStorage.getItem("win10_creepy_puzzle_solved") === "true";
+    } catch (e) {}
+    var layer = document.getElementById(PUZZLE_LAYER_ID);
+    var chipEl = document.getElementById(PUZZLE_CHIP_ID);
+    if (solved) {
+      if (chipEl) chipEl.style.display = "none";
+      // 拼好之后先让玩家看一眼成品，再把画布收掉、露出新出现的"日记"图标
+      if (layer && layer.style.display !== "none" && !puzzleSolvedTimer) {
+        puzzleSolvedTimer = setTimeout(function () {
+          if (layer) layer.style.display = "none";
+        }, 1600);
+      }
+      return;
+    }
+    var screen = document.querySelector(".phone-screen");
+    if (!screen) return;
+    var pieces = puzzlePieceEls();
+    if (pieces.length !== 9) return;
+
+    if (layer) {
+      pieces.forEach(function (el) {
+        if (el.parentElement !== layer) layer.appendChild(el);
+      });
+      return;
+    }
+
+    layer = document.createElement("div");
+    layer.id = PUZZLE_LAYER_ID;
+    layer.innerHTML =
+      '<div class="ppl-head"><span>碎得太厉害了，能拼回来吗？</span>' +
+      '<button type="button" class="ppl-close" aria-label="稍后再拼">✕</button></div>' +
+      '<div class="ppl-guide"></div>';
+    screen.appendChild(layer);
+
+    var chip = document.createElement("button");
+    chip.type = "button";
+    chip.id = PUZZLE_CHIP_ID;
+    chip.textContent = "拼图";
+    chip.addEventListener("click", function (e) {
+      e.stopPropagation();
+      showPuzzleLayer(true);
+    });
+    screen.appendChild(chip);
+
+    layer.querySelector(".ppl-close").addEventListener("click", function (e) {
+      e.stopPropagation();
+      showPuzzleLayer(false);
+    });
+
+    var grid = window.NINGNING_GRID || { w: 66, h: 82 };
+    var GW = grid.w || 66, GH = grid.h || 82;
+    var OX = 15, OY = 15;                       // 与 main.js 的 OFFSET_X / OFFSET_Y 一致
+    var GX = OX + GW;                           // 拼合区左上角，和吸附格点对齐
+    var GY = OY + GH;
+
+    var guide = layer.querySelector(".ppl-guide");
+    if (guide) {
+      guide.style.left = (GX - 2) + "px";
+      guide.style.top = (GY - 2) + "px";
+      guide.style.width = (GW * 3 + 4) + "px";
+      guide.style.height = (GH * 3 + 4) + "px";
+    }
+
+    pieces.forEach(function (el, k) {
+      layer.appendChild(el);
+      var x, y;
+      if (k === 0) {
+        x = GX;
+        y = GY;
+      } else {
+        // 打散顺序：直接按下标摆会"半张图已经拼好"，
+        // 用一个固定置换让碎片在视觉上真的是乱的。
+        var slot = PUZZLE_SHUFFLE[k - 1] % 8;
+        var col = slot % 3;
+        var row = Math.floor(slot / 3);
+        x = OX + col * GW;
+        y = OY + (4 + row) * GH;
+      }
+      el.style.left = x + "px";
+      el.style.top = y + "px";
+      el.style.zIndex = String(10 + k);
+    });
+  }
+
+  function startPuzzleWatch() {
+    if (puzzleWatchStarted) return;
+    puzzleWatchStarted = true;
+    var pending = null;
+    var schedule = function () {
+      if (pending) return;
+      pending = setTimeout(function () {
+        pending = null;
+        ensurePuzzleLayer();
+      }, 280);
+    };
+    [document.getElementById("desktop"), document.getElementById("phone-app-grid")].forEach(function (t) {
+      if (t && window.MutationObserver) new MutationObserver(schedule).observe(t, { childList: true });
+    });
+    schedule();
+  }
+
   function openSettingsMobile() {
     var win = document.getElementById("win-settings");
     if (!win) return;
@@ -718,6 +851,8 @@
     polishAppInteriors();
     bindToastObserver();
     bindDesktopObservers();
+    ensurePuzzleLayer();
+    startPuzzleWatch();
     syncChromeTheme();
 
     // Re-sync after main.js finishes async init
@@ -725,6 +860,7 @@
       organizeHomeGrid();
       enhanceAppHeaders();
       polishAppInteriors();
+      ensurePuzzleLayer();
       syncChromeTheme();
     }, 350);
   }

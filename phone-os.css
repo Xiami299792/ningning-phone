@@ -2332,3 +2332,126 @@ html.mobile-mode .window > .title-bar {
   border-radius: 0 !important;
   display: block;
 }
+
+/* ==========================================================================
+   Loop 2 · 拼图画布 (Jigsaw Layer)
+   PC 版把 9 块碎片当作桌面图标，靠 absolute 的 left/top 定位来"拼图"。
+   手机壳把图标塞进了 CSS Grid 并用 `left:auto !important` 锁死了坐标，
+   导致碎片拖不动、也拼不起来。这里给碎片一块独立的绝对定位画布，
+   让原作 checkCreepyPuzzle() 的坐标逻辑继续成立。
+   ========================================================================== */
+#phone-puzzle-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 56;
+  display: flex;
+  background: rgba(8, 10, 18, 0.66);
+  -webkit-backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
+  touch-action: none;
+}
+
+#phone-puzzle-layer .ppl-head {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(var(--status-h) + 8px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  color: rgba(255, 255, 255, 0.92);
+  font-size: 13px;
+  letter-spacing: .4px;
+  pointer-events: none;
+}
+
+#phone-puzzle-layer .ppl-guide {
+  position: absolute;
+  border: 1px dashed rgba(255, 255, 255, 0.3);
+  border-radius: 6px;
+  pointer-events: none;
+  z-index: 9;
+}
+
+#phone-puzzle-layer .ppl-close {
+  pointer-events: auto;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+  font-size: 13px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* 碎片本体：脱离 #desktop 后 inline left/top 才会生效 */
+#phone-puzzle-layer .desktop-icon {
+  position: absolute !important;
+  width: 66px !important;
+  height: 82px !important;
+  padding: 0 !important;
+  border: none !important;
+  background: transparent !important;
+  display: block !important;
+  touch-action: none;
+  cursor: grab;
+}
+#phone-puzzle-layer .desktop-icon:active { transform: none !important; }
+#phone-puzzle-layer .desktop-icon .icon-img {
+  width: 66px !important;
+  height: 82px !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.45) !important;
+  display: block !important;
+}
+#phone-puzzle-layer .desktop-icon .icon-img img {
+  width: 66px !important;
+  height: 82px !important;
+  border-radius: 0 !important;
+  object-fit: cover !important;
+}
+#phone-puzzle-layer .desktop-icon .icon-text {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: 0;
+  padding: 10px 2px 2px;
+  font-size: 9.5px;
+  line-height: 12px;
+  color: #fff;
+  text-shadow: none;
+  text-align: center;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.66));
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  pointer-events: none;
+}
+
+/* 收起后回到主屏的小入口 */
+#phone-puzzle-chip {
+  position: absolute;
+  right: 14px;
+  bottom: calc(var(--nav-h, 34px) + 96px);
+  z-index: 40;
+  padding: 7px 14px;
+  border: none;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.9);
+  color: #1c1c1e;
+  font-size: 12px;
+  font-weight: 600;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.28);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+

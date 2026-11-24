@@ -3337,7 +3337,10 @@ document.addEventListener("DOMContentLoaded", () => {
         const now = new Date;
         el.innerText = now.getHours().toString().padStart(2, "0") + ":" + now.getMinutes().toString().padStart(2, "0");
     }, 1000);
-    function isGridOccupied(x, y, ignoreId) {
+    function isGridOccupied(x, y, ignoreId, forElement) {
+        // 手机壳的拼图画布允许碎片互相重叠，不做占位判定。
+        // （否则弹簧板里那些残留旧坐标的图标会把这个格子判成"已占用"，碎片被打回原位。）
+        if (forElement && forElement.closest && forElement.closest("#phone-puzzle-layer")) return false;
         let occupied = false;
         document.querySelectorAll(".desktop-icon").forEach(icon => {
             if (icon.id !== ignoreId && icon.style.display !== "none") {
@@ -3528,7 +3531,8 @@ document.addEventListener("DOMContentLoaded", () => {
             if (element.classList.contains("desktop-icon")) {
                 element.style.zIndex = 1;
                 const binEl = document.getElementById("icon-bin");
-                if (element.id !== "icon-bin" && isIntersecting(element, binEl)) {
+                // 手机壳的拼图画布（#phone-puzzle-layer）铺满整屏，碎片拖到左上角会误判成"丢进回收站"。
+                if (element.id !== "icon-bin" && !element.closest("#phone-puzzle-layer") && isIntersecting(element, binEl)) {
                     const dragId = element.getAttribute("data-app");
                     if (dragId !== "desktop-pic" && dragId !== "search") {
                         moveToBin_App(dragId);
@@ -3542,7 +3546,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 let maxTop = box.h - GRID_H;
                 snapLeft = Math.max(OFFSET_X, Math.min(snapLeft, maxLeft));
                 snapTop = Math.max(OFFSET_Y, Math.min(snapTop, maxTop));
-                if (isGridOccupied(snapLeft, snapTop, element.id)) {
+                if (isGridOccupied(snapLeft, snapTop, element.id, element)) {
                     element.style.left = startX + "px";
                     element.style.top = startY + "px";
                 } else {
