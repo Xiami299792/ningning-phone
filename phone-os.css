@@ -2426,6 +2426,9 @@ html.mobile-mode .window > .title-bar {
   top: 50%;
   width: min(72vw, 300px);
   height: auto;
+  aspect-ratio: 1 / 1;          /* 原图 660×660：先占好位，图片没下完也不会塌成 0 高 */
+  object-fit: contain;
+  background: #0b0b0b;
   border-radius: 12px;
   box-shadow: 0 18px 50px rgba(0, 0, 0, 0.6);
   transform: translate(-50%, -50%) scale(0.86);
